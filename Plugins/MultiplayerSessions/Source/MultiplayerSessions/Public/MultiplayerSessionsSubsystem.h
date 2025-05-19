@@ -19,9 +19,40 @@ class MULTIPLAYERSESSIONS_API UMultiplayerSessionsSubsystem : public UGameInstan
 public:
 	UMultiplayerSessionsSubsystem();
 
+	// 处理会话功能，菜单类调用
+	void CreateSession(int32 NumPublicConnections,FString MatchType);
+	void FindSessions(int32 MaxSearchResults);
+	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
+	void DestroySession();
+	void StartSession();
+
 protected:
+	// 对于代表，将添加到在线会话接口的委托列表
+	// 在外部不会被调用
+	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionsComplete(bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnStartSessionComplete(FName SessionName, bool bWasSuccessful);
 
 private:
 	IOnlineSessionPtr SessionInterface;
+
+	// 添加到在线会话接口委托列表
+	// 我们将把多人联机子系统绑定到这些。
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+	FDelegateHandle CreateSessionCompleteDelegateHandle;
+
+	FOnFindSessionsCompleteDelegate FindSessionsCompleteDelegate;
+	FDelegateHandle FindSessionsCompleteDelegateHandle;
+
+	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
+	FDelegateHandle JoinSessionCompleteDelegateHandle;
+
+	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
+	FDelegateHandle DestroySessionCompleteDelegateHandle;
+
+	FOnStartSessionCompleteDelegate StartSessionCompleteDelegate;
+	FDelegateHandle StartSessionCompleteDelegateHandle;
 
 };
