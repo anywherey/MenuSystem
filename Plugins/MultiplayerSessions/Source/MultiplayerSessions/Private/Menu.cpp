@@ -57,7 +57,7 @@ bool UMenu::Initialize()
 	if (JoinButton) {
 		JoinButton->OnClicked.AddDynamic(this, &ThisClass::JoinButtonClicked);
 	}
-	return false;
+	return true;
 }
 
 void UMenu::NativeDestruct()
@@ -84,6 +84,7 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("Failed to create session"));
 		}
+		HostButton->SetIsEnabled(true);
 	}
 }
 
@@ -100,6 +101,10 @@ void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResu
 			MultiplayerSessionsSubsystem->JoinSession(Result);
 			return;
 		}
+	}
+	if (!bWasSuccessful || SessionResults.Num() == 0)
+	{
+		JoinButton->SetIsEnabled(true);
 	}
 }
 
@@ -131,6 +136,7 @@ void UMenu::OnStartSession(bool bWasSuccessful)
 
 void UMenu::HostButtonClicked()
 {
+	HostButton->SetIsEnabled(false);
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, TEXT("Host Button Clicked"));
 	}
@@ -147,6 +153,7 @@ void UMenu::HostButtonClicked()
 
 void UMenu::JoinButtonClicked()
 {
+	JoinButton->SetIsEnabled(false);
 	if (GEngine) {
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, TEXT("Join Button Clicked"));
 	}
