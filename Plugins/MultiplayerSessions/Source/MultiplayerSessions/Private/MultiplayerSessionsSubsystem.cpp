@@ -42,7 +42,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 	LastSessionSettings->bUsesPresence = true;
 	LastSessionSettings->bUseLobbiesIfAvailable = true; // 优先使用 Steam Lobby 创建
 	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-
+	LastSessionSettings->BuildUniqueId = 1;
 
 	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
 	if (!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings)) {
