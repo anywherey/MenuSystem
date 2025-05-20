@@ -37,6 +37,7 @@ protected:
 
 private:
 	IOnlineSessionPtr SessionInterface;
+	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
 
 	// 添加到在线会话接口委托列表
 	// 我们将把多人联机子系统绑定到这些。

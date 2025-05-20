@@ -3,6 +3,7 @@
 
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSubsystem.h"
+#include "OnlineSessionSettings.h"
 
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 	CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
@@ -19,6 +20,34 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
 
 void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
+	if (!SessionInterface.IsValid()) return;
+	
+	//// 创建会话设置
+	auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
+	if (ExistingSession != nullptr)
+	{
+		SessionInterface->DestroySession(NAME_GameSession);
+	}
+
+	//// 绑定委托,以便后续可以将其从在线委托列表中删除
+	CreateSessionCompleteDelegateHandle = SessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
+
+	LastSessionSettings = MakeShareable(new FOnlineSessionSettings());
+	LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() =="NULL" ?true : false;
+	LastSessionSettings->NumPublicConnections = NumPublicConnections;
+	LastSessionSettings->bAllowJoinInProgress = true;
+	LastSessionSettings->bAllowJoinViaPresence = true;
+	LastSessionSettings->bShouldAdvertise = true;
+	LastSessionSettings->bUsesPresence = true;
+	LastSessionSettings->bUseLobbiesIfAvailable = true; // 优先使用 Steam Lobby 创建
+	LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+
+	const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+	if(!SessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *LastSessionSettings)){
+		
+		SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
+	}
 }
 
 void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
