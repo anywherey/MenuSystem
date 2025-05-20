@@ -8,6 +8,10 @@
 
 #include "MultiplayerSessionsSubsystem.generated.h"
 
+// Menu class将回调绑定到声明的自定义代表委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMultiplayerOnCreateSessionComplete, bool, bWasSuccessful);
+
+
 /**
  * 
  */
@@ -25,6 +29,12 @@ public:
 	void JoinSession(const FOnlineSessionSearchResult& SessionResult);
 	void DestroySession();
 	void StartSession();
+
+	//
+	// 菜单类将回调绑定到自定义代表委托
+	//
+	FMultiplayerOnCreateSessionComplete MultiplayerOnCreateSessionComplete;
+
 
 protected:
 	// 对于代表，将添加到在线会话接口的委托列表

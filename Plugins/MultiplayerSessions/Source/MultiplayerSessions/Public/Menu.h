@@ -21,7 +21,11 @@ protected:
 	virtual bool Initialize() override;
 	virtual void NativeDestruct() override;
 	
-
+	//
+	// 在多人联系子系统上的自定义代表委托事件
+	//
+	UFUNCTION()
+	void OnCreateSession(bool bWasSuccessful);
 private:
 
 	UPROPERTY(meta = (BindWidget))
